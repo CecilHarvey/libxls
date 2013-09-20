@@ -28,11 +28,17 @@
  *
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#ifdef _WIN32
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
 
 #include "libxls/xls.h"
 
@@ -61,6 +67,8 @@ static void Usage(char *progName)
 }
 
 extern int getopt(int nargc, char * const *nargv, const char *ostr);
+extern int optind;
+extern char *optarg;
 
 int main(int argc, char *argv[]) {
 	xlsWorkBook* pWB;
@@ -68,6 +76,9 @@ int main(int argc, char *argv[]) {
 	unsigned int i;
     int justList = 0;
     char *sheetName = "";
+    int ch;
+	struct st_row_data* row;
+	WORD cellRow, cellCol;
 
     if(argc < 2) {
         Usage(argv[0]);
@@ -77,7 +88,6 @@ int main(int argc, char *argv[]) {
 
     optind = 2; // skip file arg
 
-    int ch;
     while ((ch = getopt(argc, argv, "lt:e:q:f:")) != -1) {
         switch (ch) {
         case 'l':
@@ -100,9 +110,6 @@ int main(int argc, char *argv[]) {
             break;
         }
      }
-
-	struct st_row_data* row;
-	WORD cellRow, cellCol;
 
 	// open workbook, choose standard conversion
 	pWB = xls_open(argv[1], encoding);
