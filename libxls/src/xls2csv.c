@@ -44,7 +44,7 @@
 
 static char  stringSeparator = '\"';
 static char *lineSeparator = "\n";
-static char *fieldSeparator = ";";
+static char *fieldSeparator = ",";
 static char *encoding = "UTF-8";
 
 
