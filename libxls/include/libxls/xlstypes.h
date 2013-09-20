@@ -38,7 +38,12 @@ typedef unsigned char		BYTE;
 typedef uint16_t			WORD;
 typedef uint32_t			DWORD;
 
+#ifdef _MSC_VER
+typedef __declspec( align( 1 ) ) uint16_t			WORD_UA		;	// 2 bytes
+typedef __declspec( align( 1 ) ) uint32_t			DWORD_UA	;	// 4 bytes
+#else
 typedef uint16_t			WORD_UA		__attribute__ ((aligned (1)));	// 2 bytes
 typedef uint32_t			DWORD_UA	__attribute__ ((aligned (1)));	// 4 bytes
+#endif
 
 #endif

@@ -121,15 +121,16 @@ static const DWORD colors[] =
 
 #include <stdarg.h>
 
-static int asprintf(char **ret, const char *format, ...)
+int asprintf(char **ret, const char *format, ...)
 {
 	int i;
 	va_list ap;
+    char *str;
 
 	va_start(ap, format); 
 
 	i = vsnprintf(NULL, 0, format, ap) + 1;
-	char *str = (char *)malloc(i);
+    str = (char *)malloc(i);
 	i = vsnprintf(str, i, format, ap);
 
 	va_end(ap);
@@ -159,8 +160,9 @@ BYTE *utf8_decode(BYTE *str, DWORD len, char *encoding)
 {
 	int utf8_chars = 0;
 	BYTE *ret;
+    DWORD i;
 	
-	for(DWORD i=0; i<len; ++i) {
+    for(i=0; i<len; ++i) {
 		if(str[i] & (BYTE)0x80) {
 			++utf8_chars;
 		}
@@ -172,9 +174,11 @@ BYTE *utf8_decode(BYTE *str, DWORD len, char *encoding)
 		ret[len] = 0;
 	} else {
 		// UTF-8 encoding inline
+        BYTE *out;
+        DWORD i;
 		ret = (BYTE *)malloc(len+utf8_chars+1);
-		BYTE *out = ret;
-		for(DWORD i=0; i<len; ++i) {
+        out = ret;
+        for(i=0; i<len; ++i) {
 			BYTE c = str[i];
 			if(c & (BYTE)0x80) {
 				*out++ = (BYTE)0xC0 | (c >> 6);

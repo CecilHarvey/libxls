@@ -423,9 +423,10 @@ OLE2* ole2_open(const BYTE *file)
 
 void ole2_close(OLE2* ole2)
 {
+    int i;
 	fclose(ole2->file);
 
-	for(int i=0; i<ole2->files.count; ++i) {
+    for(i=0; i<ole2->files.count; ++i) {
 		free(ole2->files.file[i].name);
 	}
 	free(ole2->files.file);
@@ -495,11 +496,12 @@ static size_t read_MSAT(OLE2* ole2, OLE2Header* oleh)
 		//printf("sid=%u (0x%x) sector=%u\n", sid, sid, ole2->lsector);
         while (sid != ENDOFCHAIN && sid != FREESECT) // FREESECT only here due to an actual file that requires it (old Apple Numbers bug)
 		{
+           int posInSector;
+
            // read MSAT sector
            sector_read(ole2, sector, sid);
 
            // read content
-           int posInSector;
            for (posInSector = 0; posInSector < (ole2->lsector-4)/4; posInSector++)
 		   {
               DWORD s = *(DWORD_UA *)(sector + posInSector*4);

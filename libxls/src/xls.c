@@ -199,8 +199,9 @@ void xls_appendSST(xlsWorkBook* pWB,BYTE* buf,DWORD size)
         {
             if (flag & 0x1)
             {
+                size_t new_len;
                 ln_toread = min((size-ofs)/2, ln);
-                size_t new_len = 0;
+                new_len = 0;
                 ret=unicode_decode(buf+ofs,ln_toread*2,&new_len,pWB->charset);
 
                 if (ret == NULL)
@@ -299,8 +300,9 @@ void xls_appendSST(xlsWorkBook* pWB,BYTE* buf,DWORD size)
 static double NumFromRk(BYTE* rk)
 {
     DWORD drk;
+    double ret;
+
     drk=*(DWORD_UA *)rk;
-	double ret;
 
 	// What kind of value is this ?
     if (drk & 0x02) {
@@ -1068,26 +1070,31 @@ void xls_parseWorkSheet(xlsWorkSheet* pWS)
 			break;
 		case 0x00D7:
 			if(xls_debug > 10) {
+                DWORD *foo;
+                WORD *goo;
+                int i;
 				printf("DBCELL: size %d\n", tmp.size);
-				DWORD *foo = (DWORD_UA *)buf;
+                foo = (DWORD_UA *)buf;
 				printf("DBCELL OFFSET=%4.4u -> ROW %ld\n", foo[0], lastPos-foo[0]);
 				++foo;
-				WORD *goo = (WORD *)foo;
-				for(int i=0; i<5; ++i) printf("goo[%d]=%4.4x %u\n", i, goo[i], goo[i]);
+                goo = (WORD *)foo;
+                for(i=0; i<5; ++i) printf("goo[%d]=%4.4x %u\n", i, goo[i], goo[i]);
 			}
 			break;
         case 0x020B:		//INDEX
 			if(xls_debug > 10) {
+                DWORD *foo;
+                int i;
 				printf("INDEX: size %d\n", tmp.size);
-				DWORD *foo = (DWORD_UA *)buf;
-				for(int i=0; i<5; ++i) printf("FOO[%d]=%4.4x %u\n", i, foo[i], foo[i]);
+                foo = (DWORD_UA *)buf;
+                for(i=0; i<5; ++i) printf("FOO[%d]=%4.4x %u\n", i, foo[i], foo[i]);
 			}
 #if 0
 0	4 4	4 8	4
-12	4 16	4∙nm
+12	4 16	4?nm
 Not used Index to first used row (rf, 0-based) Index to first row of unused tail of sheet (rl, last used row + 1, 0-based)
-Absolute stream position of the DEFCOLWIDTH record (➜5.32) of the current sheet. If this record does not exist, the offset points to the record at the position where the DEFCOLWIDTH record would occur.
-Array of nm absolute stream positions to the DBCELL record (➜5.29) of each Row Block
+Absolute stream position of the DEFCOLWIDTH record (?5.32) of the current sheet. If this record does not exist, the offset points to the record at the position where the DEFCOLWIDTH record would occur.
+Array of nm absolute stream positions to the DBCELL record (?5.29) of each Row Block
 #endif
             break;
         case 0x00BD:		//MULRK
