@@ -259,6 +259,7 @@ BYTE* unicode_decode(const BYTE *s, int len, size_t *newlen, const char* to_enc)
     return outbuf;
 #else
 	// Do wcstombs conversion
+	wchar_t *orig = NULL;
 	char *converted = NULL;
 	int count, count2;
 
@@ -267,14 +268,18 @@ BYTE* unicode_decode(const BYTE *s, int len, size_t *newlen, const char* to_enc)
 		return "*null*";
 	}
 
-	count = wcstombs(NULL, (wchar_t*)s, 0);
+	orig = _alloca(sizeof(wchar_t) * (len + 1));
+	memcpy(orig, s, sizeof(wchar_t) * len);
+	orig[len] = '\0';
+
+	count = wcstombs(NULL, (wchar_t*)orig, 0);
 	if (count <= 0) {
 		if (newlen) *newlen = 0;
 		return NULL;
 	}
 
 	converted = calloc(count+1, sizeof(char));
-	count2 = wcstombs(converted, (wchar_t*)s, count+1);
+	count2 = wcstombs(converted, (wchar_t*)orig, count+1);
 	if (count2 <= 0) {
 		printf("wcstombs failed (%d)\n", len);
 		if (newlen) *newlen = 0;
